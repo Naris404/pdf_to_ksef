@@ -65,6 +65,10 @@ if uploaded_files is not None:
 
         data = response.json()
 
+        print(inf_faktury)
+        print(data)
+        print(spis_towarow)
+
         plik_wyjsciowy = dane_do_xml(data, spis_towarow, inf_faktury)
 
         numer_fv = inf_faktury["numer_fv"].replace("/", "_")

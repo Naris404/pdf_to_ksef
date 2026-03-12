@@ -138,116 +138,112 @@ def wczytywanie_listy_towarów_plubmer(txt):
 
 
 def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury):
-    try:
-        now = datetime.now(timezone.utc)
-        result = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-        data_wystawienia = now.strftime("%Y-%m-%d")
-        xml = f"""<Faktura xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://crd.gov.pl/wzor/2025/06/25/13775/">
-            <Naglowek>
-            <KodFormularza kodSystemowy="FA (3)" wersjaSchemy="1-0E">FA</KodFormularza>
-            <WariantFormularza>3</WariantFormularza>
-            <DataWytworzeniaFa>{result}</DataWytworzeniaFa>
-            <SystemInfo>Spersonalizowana aplikacja pod Hurtownia Elektryczna PEKRA BL</SystemInfo>
-            </Naglowek>
-            <Podmiot1>
-                <DaneIdentyfikacyjne>
-                    <NIP>7491248893</NIP>
-                    <Nazwa>Adrian Jakubczyk Hurtownia Elektryczna PEKRA BL</Nazwa>
-                </DaneIdentyfikacyjne>
-                <Adres>
-                    <KodKraju>PL</KodKraju>
-                    <AdresL1>
-                    ul. Przyjaźni 54 Kędzierzyn-Koźle 47-225 Kędzierzyn-Koźle
-                    </AdresL1>
-                </Adres>
-            </Podmiot1>
-            <Podmiot2>
-                <DaneIdentyfikacyjne>
-                    <NIP>{dane_firmy['nip']}</NIP>
-                    <Nazwa>
-                    {dane_firmy['nazwa']}
-                    </Nazwa>
-                </DaneIdentyfikacyjne>
-                <Adres>
-                    <KodKraju>PL</KodKraju>
-                    <AdresL1>{dane_firmy['adres']}</AdresL1>
-                </Adres>
-            <JST>2</JST>
-            <GV>2</GV>
-            </Podmiot2>
-            <Fa>
-            <KodWaluty>PLN</KodWaluty>
-            <P_1>{data_wystawienia}</P_1>
-            <P_2>{informacje_faktury['numer_fv']}</P_2>
-            <P_13_1>{informacje_faktury['cena_net']}</P_13_1>
-            <P_14_1>{informacje_faktury['vat']}</P_14_1>
-            <P_15>{informacje_faktury['cena_brut']}</P_15>
-                <Adnotacje>
-                <P_16>2</P_16>
-                <P_17>2</P_17>
-                <P_18>2</P_18>
-                <P_18A>2</P_18A>
-                    <Zwolnienie>
-                        <P_19N>1</P_19N>
-                    </Zwolnienie>
-                    <NoweSrodkiTransportu>
-                        <P_22N>1</P_22N>
-                    </NoweSrodkiTransportu>
-                <P_23>2</P_23>
-                    <PMarzy>
-                    <P_PMarzyN>1</P_PMarzyN>
-                    </PMarzy>
-                </Adnotacje>
-            <RodzajFaktury>VAT</RodzajFaktury>
-            <TP>1</TP>
-            """
-        for towar in spis_towarow:
-            xml += f"""
-                <FaWiersz>
-                    <NrWierszaFa>{towar['lp']}</NrWierszaFa>
-                    <P_7>{towar['nazwa']}</P_7>
-                    <P_8A>{towar['jednostka']}</P_8A>
-                    <P_8B>{towar['ilosc']}</P_8B>
-                    <P_9A>{towar['cena_jed_netto']}</P_9A>
-                    <P_11>{towar['wartosc_netto']}</P_11>
-                    <P_12>23</P_12>
-                </FaWiersz>
-            """
-        if informacje_faktury["zaplacone"] == 1:
-            a = f"""<Zaplacono>1</Zaplacono>
-                    <DataZaplaty>{informacje_faktury['termin_platnosci']}</DataZaplaty>
-            
-            """
-        else:
-            a = f"""<TerminPlatnosci>
-                    <Termin>{informacje_faktury['termin_platnosci']}</Termin>
-                    </TerminPlatnosci>"""
-        xml += f"""
-                <Platnosc>
-                    {a}
-                <FormaPlatnosci>{forma_platnosci_do_numberow_ksef[informacje_faktury['forma_platnosci']]}</FormaPlatnosci>
-                    <RachunekBankowy>
-                    <NrRB>14102037140000490202780427</NrRB>
-                    <NazwaBanku>PKO Bank Polski SA</NazwaBanku>
-                    </RachunekBankowy>
-                </Platnosc>
-            </Fa>
-
-            """
-        if informacje_faktury["uwagi"] != "":
-            xml += f"""
-            <Stopka>
-                <Informacje>
-                    <StopkaFaktury>
-                    Uwagi: {informacje_faktury['uwagi']}
-                    </StopkaFaktury>
-                </Informacje>
-            </Stopka>
-        </Faktura>
+    now = datetime.now(timezone.utc)
+    result = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+    data_wystawienia = now.strftime("%Y-%m-%d")
+    xml = f"""<Faktura xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://crd.gov.pl/wzor/2025/06/25/13775/">
+        <Naglowek>
+        <KodFormularza kodSystemowy="FA (3)" wersjaSchemy="1-0E">FA</KodFormularza>
+        <WariantFormularza>3</WariantFormularza>
+        <DataWytworzeniaFa>{result}</DataWytworzeniaFa>
+        <SystemInfo>Spersonalizowana aplikacja pod Hurtownia Elektryczna PEKRA BL</SystemInfo>
+        </Naglowek>
+        <Podmiot1>
+            <DaneIdentyfikacyjne>
+                <NIP>7491248893</NIP>
+                <Nazwa>Adrian Jakubczyk Hurtownia Elektryczna PEKRA BL</Nazwa>
+            </DaneIdentyfikacyjne>
+            <Adres>
+                <KodKraju>PL</KodKraju>
+                <AdresL1>
+                ul. Przyjaźni 54 Kędzierzyn-Koźle 47-225 Kędzierzyn-Koźle
+                </AdresL1>
+            </Adres>
+        </Podmiot1>
+        <Podmiot2>
+            <DaneIdentyfikacyjne>
+                <NIP>{dane_firmy['nip']}</NIP>
+                <Nazwa>
+                {dane_firmy['nazwa']}
+                </Nazwa>
+            </DaneIdentyfikacyjne>
+            <Adres>
+                <KodKraju>PL</KodKraju>
+                <AdresL1>{dane_firmy['adres']}</AdresL1>
+            </Adres>
+        <JST>2</JST>
+        <GV>2</GV>
+        </Podmiot2>
+        <Fa>
+        <KodWaluty>PLN</KodWaluty>
+        <P_1>{data_wystawienia}</P_1>
+        <P_2>{informacje_faktury['numer_fv']}</P_2>
+        <P_13_1>{informacje_faktury['cena_net']}</P_13_1>
+        <P_14_1>{informacje_faktury['vat']}</P_14_1>
+        <P_15>{informacje_faktury['cena_brut']}</P_15>
+            <Adnotacje>
+            <P_16>2</P_16>
+            <P_17>2</P_17>
+            <P_18>2</P_18>
+            <P_18A>2</P_18A>
+                <Zwolnienie>
+                    <P_19N>1</P_19N>
+                </Zwolnienie>
+                <NoweSrodkiTransportu>
+                    <P_22N>1</P_22N>
+                </NoweSrodkiTransportu>
+            <P_23>2</P_23>
+                <PMarzy>
+                <P_PMarzyN>1</P_PMarzyN>
+                </PMarzy>
+            </Adnotacje>
+        <RodzajFaktury>VAT</RodzajFaktury>
+        <TP>1</TP>
         """
-    except Exception as e:
-        print(e)
-        xml = "Coś poszło nie tak podczas tworzenia XML. Sprawdź dane wejściowe. Prawdopodobnie problemem jest brakujące pole lub niepoprawny format danych."
+    for towar in spis_towarow:
+        xml += f"""
+            <FaWiersz>
+                <NrWierszaFa>{towar['lp']}</NrWierszaFa>
+                <P_7>{towar['nazwa']}</P_7>
+                <P_8A>{towar['jednostka']}</P_8A>
+                <P_8B>{towar['ilosc']}</P_8B>
+                <P_9A>{towar['cena_jed_netto']}</P_9A>
+                <P_11>{towar['wartosc_netto']}</P_11>
+                <P_12>23</P_12>
+            </FaWiersz>
+        """
+    if informacje_faktury["zaplacone"] == 1:
+        a = f"""<Zaplacono>1</Zaplacono>
+                <DataZaplaty>{informacje_faktury['termin_platnosci']}</DataZaplaty>
+        
+        """
+    else:
+        a = f"""<TerminPlatnosci>
+                <Termin>{informacje_faktury['termin_platnosci']}</Termin>
+                </TerminPlatnosci>"""
+    xml += f"""
+            <Platnosc>
+                {a}
+            <FormaPlatnosci>{forma_platnosci_do_numberow_ksef[informacje_faktury['forma_platnosci']]}</FormaPlatnosci>
+                <RachunekBankowy>
+                <NrRB>14102037140000490202780427</NrRB>
+                <NazwaBanku>PKO Bank Polski SA</NazwaBanku>
+                </RachunekBankowy>
+            </Platnosc>
+        </Fa>
+
+        """
+    if informacje_faktury["uwagi"] != "":
+        xml += f"""
+        <Stopka>
+            <Informacje>
+                <StopkaFaktury>
+                Uwagi: {informacje_faktury['uwagi']}
+                </StopkaFaktury>
+            </Informacje>
+        </Stopka>
+    </Faktura>
+    """
     return xml
 
 
