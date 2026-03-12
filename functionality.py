@@ -50,7 +50,7 @@ def dane_firmy(txt):
     except:
         pelny_adres = ""
         nazwa = ""
-    return {"nip": nip, "nazwa": nazwa, "pelny_adres": pelny_adres}
+    return {"nip": nip, "nazwa": nazwa, "adres": pelny_adres}
 
 
 def informacje_faktury(txt):

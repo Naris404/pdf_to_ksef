@@ -65,9 +65,8 @@ if uploaded_files is not None:
 
         data = response.json()
 
-        print(inf_faktury)
-        print(data)
-        print(spis_towarow)
+        if data['success'] == False:
+            data = dane_firmowe
 
         plik_wyjsciowy = dane_do_xml(data, spis_towarow, inf_faktury)
 
