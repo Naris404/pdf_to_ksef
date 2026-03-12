@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from requests import get
 import os
 from pypdf import PdfReader
@@ -16,8 +16,9 @@ from fucntionality import (
 )
 
 
-load_dotenv()
-api_key = os.getenv("API_KEY")
+# load_dotenv()
+# api_key = os.getenv("API_KEY")
+api_key = st.secrets["api_key"]
 
 
 st.title("Przetwarzanie PDF do KSeF 📑")
