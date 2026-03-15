@@ -2,6 +2,7 @@
 import re
 from datetime import datetime, timezone
 
+powiazane_nipy = ["7492107657", "7492095718", "7491130950"]
 
 forma_platnosci_do_numberow_ksef = {
     "gotowka": 1,
@@ -198,8 +199,11 @@ def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury):
                 </PMarzy>
             </Adnotacje>
         <RodzajFaktury>VAT</RodzajFaktury>
-        <TP>1</TP>
         """
+    if dane_firmy['nip'] in powiazane_nipy:
+        xml += f"""
+        <TP>1</TP>
+     """
     for towar in spis_towarow:
         xml += f"""
             <FaWiersz>
@@ -242,6 +246,8 @@ def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury):
                 </StopkaFaktury>
             </Informacje>
         </Stopka>
+        """
+    xml += f"""
     </Faktura>
     """
     return xml
