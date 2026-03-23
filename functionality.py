@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 powiazane_nipy = ["7492107657", "7492095718", "7491130950"]
 
 forma_platnosci_do_numberow_ksef = {
-    "gotowka": 1,
+    "gotówka": 1,
     "karta": 2,
     "bon": 3,
     "czek": 4,
@@ -99,17 +99,18 @@ def wczytywanie_listy_towarów_plubmer(txt):
     spis_towarow = []
     konflikty = []
     opisy = ["lp", "nazwa", "kod", "ilosc", "jednostka", "cena_jed_netto", "wartosc_netto", "vat", "pkwiu", "rabat"]
+    index_do_zmian = [3, 5, 6, 7]
     for x in xy:
         if len(x.split("|")) == 11:
             splited = x.split("|")
             lp = splited[1].strip()
             nazwa = splited[2].strip()
             kod = splited[3].strip()
-            ilosc = splited[4].strip().split()[0].strip()
+            ilosc = splited[4].strip().split()[0].strip().replace(",", "")
             jm = splited[4].strip().split()[1].strip()
-            cena_net = splited[5].strip()
-            wart_net = splited[6].strip()
-            vat = splited[7].strip()
+            cena_net = splited[5].strip().replace(",", "")
+            wart_net = splited[6].strip().replace(",", "")
+            vat = splited[7].strip().replace(",", "")
             pkwiu = splited[8].strip()
             rabat = splited[9].strip()
             spis_towarow.append({"lp": lp, "nazwa": nazwa, "kod": kod, "ilosc": ilosc, "jednostka": jm, "cena_jed_netto": cena_net, "wartosc_netto": wart_net, "vat": vat, "pkwiu": pkwiu, "rabat": rabat})
@@ -124,12 +125,18 @@ def wczytywanie_listy_towarów_plubmer(txt):
                         s = s.strip()
                         splitted = s.split("  ")
                         if len(splitted) == 1:
-                            towar[opisy[i]] = splitted[0]
+                            if i in index_do_zmian:
+                                towar[opisy[i]] = splitted[0].strip().replace(",", "")
+                            else:
+                                towar[opisy[i]] = splitted[0].strip()    
                             i += 1
                         elif len(splitted) != 1:
                             for s in splitted:
                                 if s.strip() != "":
-                                    towar[opisy[i]] = s.strip()
+                                    if i in index_do_zmian:
+                                        towar[opisy[i]] = s.strip().replace(",", "")
+                                    else:
+                                        towar[opisy[i]] = s.strip()
                                     i += 1
                 spis_towarow.append(towar)
             except:
