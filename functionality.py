@@ -88,7 +88,7 @@ def informacje_faktury(txt):
     except:
         uwagi = -1
     try:
-        zaplacone = 1 if "z a p ł a c o n o" in txt else 0
+        zaplacone = 1 if "z a p ł a c o n o" or "zapłacono" in txt else 0
     except:
         zaplacone = -1
     return {"data_wystawienia": data_wystawienia, "numer_fv": numer_fv, "cena_net": cena_net, "vat": vat, "cena_brut": cena_brut, "forma_platnosci": forma_platnosci, "termin_platnosci": termin_platnosci, "zaplacone": zaplacone, "uwagi": uwagi}
@@ -217,9 +217,9 @@ def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury):
                 <NrWierszaFa>{towar['lp']}</NrWierszaFa>
                 <P_7>{towar['nazwa']}</P_7>
                 <P_8A>{towar['jednostka']}</P_8A>
-                <P_8B>{towar['ilosc']}</P_8B>
-                <P_9A>{towar['cena_jed_netto']}</P_9A>
-                <P_11>{towar['wartosc_netto']}</P_11>
+                <P_8B>{towar['ilosc'].replace(",", "")}</P_8B>
+                <P_9A>{towar['cena_jed_netto'].replace(",", "")}</P_9A>
+                <P_11>{towar['wartosc_netto'].replace(",", "")}</P_11>
                 <P_12>23</P_12>
             </FaWiersz>
         """
