@@ -88,7 +88,7 @@ def informacje_faktury(txt):
     except:
         uwagi = -1
     try:
-        zaplacone = 1 if "z a p ł a c o n o" or "zapłacono" in txt else 0
+        zaplacone = 1 if "z a p ł a c o n o" in txt else 0
     except:
         zaplacone = -1
     return {"data_wystawienia": data_wystawienia, "numer_fv": numer_fv, "cena_net": cena_net, "vat": vat, "cena_brut": cena_brut, "forma_platnosci": forma_platnosci, "termin_platnosci": termin_platnosci, "zaplacone": zaplacone, "uwagi": uwagi}
@@ -223,7 +223,7 @@ def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury):
                 <P_12>23</P_12>
             </FaWiersz>
         """
-    if informacje_faktury["zaplacone"] == 1:
+    if informacje_faktury["zaplacone"] == 1 or forma_platnosci_do_numberow_ksef[informacje_faktury['forma_platnosci']] == 1:
         a = f"""<Zaplacono>1</Zaplacono>
                 <DataZaplaty>{informacje_faktury['termin_platnosci']}</DataZaplaty>
         
