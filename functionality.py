@@ -34,6 +34,12 @@ def napraw_polskie_znaki(tekst):
         
     return nowy_tekst
 
+def napraw_niedozwolone_znaki(tekst):
+    tekst = tekst.replace("&", "&amp;")
+    tekst = tekst.replace("<", "&lt;")
+    tekst = tekst.replace(">", "&gt;")
+    return tekst
+
 def dane_firmy(txt):
     try:
         x = re.findall("Nabywca[\s\S]*?Forma", txt)[0].split("\n")
@@ -172,12 +178,12 @@ def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury):
             <DaneIdentyfikacyjne>
                 <NIP>{dane_firmy['nip']}</NIP>
                 <Nazwa>
-                {dane_firmy['nazwa']}
+                {napraw_niedozwolone_znaki(dane_firmy['nazwa'])}
                 </Nazwa>
             </DaneIdentyfikacyjne>
             <Adres>
                 <KodKraju>PL</KodKraju>
-                <AdresL1>{dane_firmy['adres']}</AdresL1>
+                <AdresL1>{napraw_niedozwolone_znaki(dane_firmy['adres'])}</AdresL1>
             </Adres>
         <JST>2</JST>
         <GV>2</GV>
@@ -215,7 +221,7 @@ def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury):
         xml += f"""
             <FaWiersz>
                 <NrWierszaFa>{towar['lp']}</NrWierszaFa>
-                <P_7>{towar['nazwa']}</P_7>
+                <P_7>{napraw_niedozwolone_znaki(towar['nazwa'])}</P_7>
                 <P_8A>{towar['jednostka']}</P_8A>
                 <P_8B>{towar['ilosc'].replace(",", "")}</P_8B>
                 <P_9A>{towar['cena_jed_netto'].replace(",", "")}</P_9A>
@@ -249,7 +255,7 @@ def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury):
         <Stopka>
             <Informacje>
                 <StopkaFaktury>
-                Uwagi: {informacje_faktury['uwagi']}
+                Uwagi: {napraw_niedozwolone_znaki(informacje_faktury['uwagi'])}
                 </StopkaFaktury>
             </Informacje>
         </Stopka>
