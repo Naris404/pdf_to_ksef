@@ -68,6 +68,16 @@ if uploaded_files is not None:
         if data['success'] == False:
             data = dane_firmowe
 
+        try:
+            a = data['adres']
+        except:
+            data['adres'] = dane_firmowe['adres']
+        
+        try:
+            a = data['nazwa']
+        except:
+            data['nazwa'] = dane_firmowe['nazwa']
+
         plik_wyjsciowy = dane_do_xml(data, spis_towarow, inf_faktury)
 
         numer_fv = inf_faktury["numer_fv"].replace("/", "_")
