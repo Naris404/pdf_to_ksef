@@ -26,6 +26,7 @@ st.title("Przetwarzanie PDF do KSeF 📑")
 # --- SEKCJA 1: UPLOAD PLIKU ---
 st.header("Prześlij swoje pliki PDF")
 uploaded_files = st.file_uploader("Wybierz plik PDF z dysku", type=["pdf"], accept_multiple_files=True)
+odbiorca = st.checkbox("Zaznacz, jeśli jest inny nabywca i odbiorca", key="different_odbiorca")
 
 if uploaded_files is not None:
     for uploaded_file in uploaded_files:
@@ -78,7 +79,10 @@ if uploaded_files is not None:
         except:
             data['nazwa'] = dane_firmowe['nazwa']
 
-        plik_wyjsciowy = dane_do_xml(data, spis_towarow, inf_faktury)
+        if odbiorca:
+            data['odbiorca'] = dane_firmowe["odbiorca"]
+
+        plik_wyjsciowy = dane_do_xml(data, spis_towarow, inf_faktury, odbiorca)
 
         numer_fv = inf_faktury["numer_fv"].replace("/", "_")
         

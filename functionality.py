@@ -43,6 +43,10 @@ def napraw_niedozwolone_znaki(tekst):
 def dane_firmy(txt):
     try:
         x = re.findall("Nabywca[\s\S]*?Forma", txt)[0].split("\n")
+        for i in range(len(x)):
+            if "Odbiorca" in x[i]:
+                odbiorca = ''.join(x[i:(len(x)-1)]).replace("Odbiorca:", "").strip()
+                break
         x = x[:-1]
         nip = x[0].split()[-1].replace("-", "")
     except:
@@ -57,7 +61,7 @@ def dane_firmy(txt):
     except:
         pelny_adres = ""
         nazwa = ""
-    return {"nip": nip, "nazwa": nazwa, "adres": pelny_adres}
+    return {"nip": nip, "nazwa": nazwa, "adres": pelny_adres, "odbiorca": odbiorca}
 
 
 def informacje_faktury(txt):
@@ -151,7 +155,7 @@ def wczytywanie_listy_towarów_plubmer(txt):
     return spis_towarow,konflikty
 
 
-def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury):
+def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury, odbiorca=False):
     now = datetime.now(timezone.utc)
     result = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
     data_wystawienia = now.strftime("%Y-%m-%d")
@@ -169,9 +173,7 @@ def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury):
             </DaneIdentyfikacyjne>
             <Adres>
                 <KodKraju>PL</KodKraju>
-                <AdresL1>
-                ul. Przyjaźni 54 Kędzierzyn-Koźle 47-225 Kędzierzyn-Koźle
-                </AdresL1>
+                <AdresL1>ul. Przyjaźni 54 Kędzierzyn-Koźle 47-225 Kędzierzyn-Koźle</AdresL1>
             </Adres>
         </Podmiot1>
         <Podmiot2>
@@ -188,6 +190,20 @@ def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury):
         <JST>2</JST>
         <GV>2</GV>
         </Podmiot2>
+        """
+    if odbiorca:
+        xml += f"""
+        <Podmiot3>
+            <DaneIdentyfikacyjne>
+                <BrakID>1</BrakID>
+                <Nazwa>
+                {napraw_niedozwolone_znaki(dane_firmy['odbiorca'])}
+                </Nazwa>
+            </DaneIdentyfikacyjne>
+            <Rola>2</Rola>
+        </Podmiot3>
+        """
+    xml += f"""
         <Fa>
         <KodWaluty>PLN</KodWaluty>
         <P_1>{data_wystawienia}</P_1>
