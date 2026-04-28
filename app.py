@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 from requests import get
 import os
 from pypdf import PdfReader
@@ -12,7 +12,9 @@ from functionality import (
     informacje_faktury,
     wczytywanie_listy_towarów_plubmer,
     sprawdz_poprawnosc,
-    dane_do_xml
+    dane_do_xml,
+    preview_invoice_streamlit,
+    send_to_ksef
 )
 
 
@@ -83,6 +85,7 @@ if uploaded_files is not None:
             data['odbiorca'] = dane_firmowe["odbiorca"]
 
         plik_wyjsciowy = dane_do_xml(data, spis_towarow, inf_faktury, odbiorca)
+        # preview_invoice_streamlit(data, spis_towarow, inf_faktury, odbiorca)
 
         numer_fv = inf_faktury["numer_fv"].replace("/", "_")
         
@@ -95,5 +98,8 @@ if uploaded_files is not None:
             file_name=f"{numer_fv}.xml",
             mime="application/xml"
         )
+        # st.button(key=f"send-{numer_fv}",
+        #           label="Wyślij tą fakturę KSeF",
+        #           on_click=send_to_ksef, args=(plik_wyjsciowy,))
 else:
     st.info("Czekam na plik...")

@@ -159,6 +159,18 @@ def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury, odbiorca=False):
     now = datetime.now(timezone.utc)
     result = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
     data_wystawienia = now.strftime("%Y-%m-%d")
+    if odbiorca and napraw_niedozwolone_znaki(dane_firmy['odbiorca']) == "Centrum Kształcenia Zawodowego w Kędzierzynie-Koźle ul. Mostowa 7 47-223 Kędzierzyn-Koźle":
+        jst = "1"
+        odbiorca_nip = "<NIP>7491905285</NIP>"
+        rola = "8"
+    elif odbiorca and napraw_niedozwolone_znaki(dane_firmy['odbiorca']) == "Przedszkole Publiczne nr26ul. Bolesława Śmiałego 5  47-232 KĘDZIERZYN-KOŹLE":
+        jst = "1"
+        odbiorca_nip = "<NIP>7491517749</NIP>"
+        rola = "8"
+    else:
+        jst = "2"
+        odbiorca_nip = "<BrakID>1</BrakID>"
+        rola = "2"
     xml = f"""<Faktura xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://crd.gov.pl/wzor/2025/06/25/13775/">
         <Naglowek>
         <KodFormularza kodSystemowy="FA (3)" wersjaSchemy="1-0E">FA</KodFormularza>
@@ -187,7 +199,7 @@ def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury, odbiorca=False):
                 <KodKraju>PL</KodKraju>
                 <AdresL1>{napraw_niedozwolone_znaki(dane_firmy['adres'])}</AdresL1>
             </Adres>
-        <JST>2</JST>
+        <JST>{jst}</JST>
         <GV>2</GV>
         </Podmiot2>
         """
@@ -195,12 +207,12 @@ def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury, odbiorca=False):
         xml += f"""
         <Podmiot3>
             <DaneIdentyfikacyjne>
-                <BrakID>1</BrakID>
+                {odbiorca_nip}
                 <Nazwa>
                 {napraw_niedozwolone_znaki(dane_firmy['odbiorca'])}
                 </Nazwa>
             </DaneIdentyfikacyjne>
-            <Rola>2</Rola>
+            <Rola>{rola}</Rola>
         </Podmiot3>
         """
     xml += f"""
@@ -282,9 +294,62 @@ def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury, odbiorca=False):
     return xml
 
 
+def preview_invoice_streamlit(dane_firmy, spis_towarow, informacje_faktury, odbiorca=False):
+    """Render a Streamlit invoice preview using the same variables as dane_do_xml."""
+    try:
+        import streamlit as st
+    except ModuleNotFoundError:
+        raise RuntimeError("Streamlit is required for preview_invoice_streamlit")
+
+    st.subheader("Podgląd faktury")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("**Dane nabywcy / odbiorcy**")
+        st.write(f"**NIP:** {dane_firmy['nip']}")
+        st.write(f"**Nazwa:** {napraw_niedozwolone_znaki(dane_firmy['nazwa'])}")
+        st.write(f"**Adres:** {napraw_niedozwolone_znaki(dane_firmy['adres'])}")
+        if odbiorca:
+            st.write(f"**Odbiorca:** {napraw_niedozwolone_znaki(dane_firmy['odbiorca'])}")
+
+    with col2:
+        st.markdown("**Dane faktury**")
+        st.write(f"**Numer faktury:** {informacje_faktury['numer_fv']}")
+        st.write(f"**Termin płatności:** {informacje_faktury['termin_platnosci']}")
+        st.write(f"**Forma płatności:** {informacje_faktury['forma_platnosci']}")
+        st.write(f"**Zapłacono:** {'Tak' if informacje_faktury['zaplacone'] == 1 else 'Nie'}")
+
+    st.markdown("**Podsumowanie kwot**")
+    st.write(f"Netto: {informacje_faktury['cena_net']}")
+    st.write(f"VAT: {informacje_faktury['vat']}")
+    st.write(f"Brutto: {informacje_faktury['cena_brut']}")
+
+    if informacje_faktury.get('uwagi'):
+        st.markdown("**Uwagi**")
+        st.write(napraw_niedozwolone_znaki(informacje_faktury['uwagi']))
+
+    if spis_towarow:
+        st.markdown("**Pozycje faktury**")
+        pozycje = []
+        for towar in spis_towarow:
+            pozycje.append({
+                'Nazwa': napraw_niedozwolone_znaki(towar['nazwa']),
+                'Ilość': towar['ilosc'].replace(",", ""),
+                'Jednostka': towar['jednostka'],
+                'Cena jedn. netto': towar['cena_jed_netto'].replace(",", ""),
+                'Wartość netto': towar['wartosc_netto'].replace(",", "")
+            })
+        st.table(pozycje)
+    else:
+        st.info("Brak pozycji towarowych do wyświetlenia.")
+
+
 def sprawdz_poprawnosc(x: dict):
     a = []
     for key, value in x.items():
         if value == -1:
             a.append(key)
     return a
+
+def send_to_ksef(xml):
+    pass
