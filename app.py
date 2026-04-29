@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from requests import get
 import os
 from pypdf import PdfReader
