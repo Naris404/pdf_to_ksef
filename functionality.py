@@ -167,6 +167,10 @@ def dane_do_xml(dane_firmy, spis_towarow, informacje_faktury, odbiorca=False):
         jst = "1"
         odbiorca_nip = "<NIP>7491517749</NIP>"
         rola = "8"
+    elif odbiorca and napraw_niedozwolone_znaki(dane_firmy['odbiorca']) == "Publiczna Szkoła Podstawowa nr 10ul. Szkolna 3  47-225 Kędzierzyn-Koźle":
+        jst = "1"
+        odbiorca_nip = "<NIP>7491985427</NIP>"
+        rola = "8"
     else:
         jst = "2"
         odbiorca_nip = "<BrakID>1</BrakID>"
